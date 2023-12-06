@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Application Form</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+    <h2>Loan Application Form</h2>
+
+    <form id="loanForm">
+        <label for="principal">Principal Amount:</label>
+        <input type="number" name="principal" id="principal" required><br>
+
+        <label for="duration">Loan Duration:</label>
+        <input type="number" name="duration" id="duration" required>
+        <select name="durationType" id="durationType" onchange="showDurationInput()" required>
+            <option value="days">Days</option>
+            <option value="weeks">Weeks</option>
+            <option value="years">Years</option>
+        </select><br>
+
+        <div id="specificDurationContainer" style="display: none;">
+            <label for="specificDuration">Specify Duration:</label>
+            <input type="number" name="specificDuration" id="specificDuration" required>
+        </div>
+
+        <label for="nextOfKin">Next of Kin:</label>
+        <input type="text" name="nextOfKin" id="nextOfKin" required><br>
+
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <!-- Modal -->
+    <div class="modal fade" id="loanDetailsModal" tabindex="-1" role="dialog" aria-labelledby="loanDetailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loanDetailsModalLabel">Loan Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="loanDetailsBody">
+                    <!-- Loan details will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showDurationInput() {
+            var durationType = $('#durationType').val();
+            if (durationType === 'days' || durationType === 'years') {
+                $('#specificDurationContainer').show();
+            } else {
+                $('#specificDurationContainer').hide();
+            }
+        }
+
+        function submitForm() {
+            // Get form data
+            var principal = $('#principal').val();
+            var duration = $('#duration').val();
+            var durationType = $('#durationType').val();
+            var specificDuration = $('#specificDuration').val();
+            var nextOfKin = $('#nextOfKin').val();
+
+            // Validate form data (add additional validation as needed)
+            if (principal <= 0 || duration <= 0 || nextOfKin.trim() === '') {
+                alert("Invalid input. Please enter valid values for all fields.");
+                return;
+            }
+
+            if ((durationType === 'days' || durationType === 'years') && specificDuration <= 0) {
+                alert("Invalid duration input. Please enter a valid duration.");
+                return;
+            }
+
+            // Use specific duration if applicable
+            duration = (durationType === 'days' || durationType === 'years') ? specificDuration : duration;
+
+            // Determine fixed interest rate based on duration
+            var fixedInterestRate = getFixedInterestRate(durationType);
+
+            // Calculate simple interest
+            var interest = principal * fixedInterestRate * duration;
+
+            // Display loan details in the modal
+            showLoanDetailsModal(principal, fixedInterestRate, duration, durationType, nextOfKin, interest);
+
+            // Send data to the server for database insertion
+            sendToDatabase(principal, fixedInterestRate, duration, durationType, specificDuration, nextOfKin, interest);
+        }
+
+        function getFixedInterestRate(durationType) {
+            // Define fixed interest rates based on duration type
+            var interestRates = {
+                days: 0.1,  // 10%
+                weeks: 0.08, // 8%
+                years: 0.05  // 5%
+            };
+
+            return interestRates[durationType] || 0;
+        }
+
+        function showLoanDetailsModal(principal, fixedInterestRate, duration, durationType, nextOfKin, interest) {
+            // Display loan details in the modal
+            var modalBody = '<p>Loan Amount: ' + principal + '</p>';
+            modalBody += '<p>Fixed Interest Rate: ' + fixedInterestRate * 100 + '%</p>';
+            modalBody += '<p>Loan Duration: ' + duration + ' ' + durationType + '</p>';
+            modalBody += '<p>Next of Kin: ' + nextOfKin + '</p>';
+            modalBody += '<p>Simple Interest: ' + interest + '</p>';
+
+            // Set modal content
+            $('#loanDetailsBody').html(modalBody);
+
+            // Show the modal
+            $('#loanDetailsModal').modal('show');
+        }
+
+        function sendToDatabase(principal, fixedInterestRate, duration, durationType, specificDuration, nextOfKin, interest) {
+            // Send data to the server using AJAX
+            $.ajax({
+                type: 'POST',
+                url: 'process_loan.php',
+                data: {
+                    principal: principal,
+                    fixedInterestRate: fixedInterestRate,
+                    duration: duration,
+                    durationType: durationType,
+                    specificDuration: specificDuration,
+                    nextOfKin: nextOfKin,
+                    interest: interest
+                },
+                success: function (response) {
+                    // Display any response from the server (if needed)
+                    console.log(response);
+                },
+                error: function (error) {
+                    console.log(error);
+                    alert('An error occurred while processing your request.');
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>
+<!-- ... (previous HTML code) ... -->
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" role="dialog" aria-labelledby="previewModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">Loan Application Preview</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="previewModalBody">
+                <!-- Loan details preview will be displayed here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="proceedWithLoan()">Proceed</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitForm() {
+        // ... (previous code) ...
+
+        // Calculate total amount to be paid back (principal + interest)
+        var totalAmount = parseFloat(principal) + parseFloat(interest);
+
+        // Display loan details in the preview modal
+        showLoanPreview(principal, fixedInterestRate, duration, durationType, nextOfKin, nextOfKinPhone, interest, totalAmount);
+    }
+
+    function showLoanPreview(principal, fixedInterestRate, duration, durationType, nextOfKin, nextOfKinPhone, interest, totalAmount) {
+        // Display loan details in the preview modal
+        var previewModalBody = '<p>Loan Amount: ' + principal + '</p>';
+        previewModalBody += '<p>Fixed Interest Rate: ' + fixedInterestRate * 100 + '%</p>';
+        previewModalBody += '<p>Loan Duration: ' + duration + ' ' + durationType + '</p>';
+        previewModalBody += '<p>Next of Kin: ' + nextOfKin + '</p>';
+        previewModalBody += '<p>Next of Kin\'s Phone Number: ' + nextOfKinPhone + '</p>';
+        previewModalBody += '<p>Simple Interest: ' + interest + '</p>';
+        previewModalBody += '<p>Total Amount to be Paid Back: ' + totalAmount + '</p>';
+
+        // Set modal content
+        $('#previewModalBody').html(previewModalBody);
+
+        // Show the preview modal
+        $('#previewModal').modal('show');
+    }
+
+    function proceedWithLoan() {
+        // Get data from the form
+        var principal = $('#principal').val();
+        var fixedInterestRate = getFixedInterestRate($('#durationType').val());
+        var duration = $('#duration').val();
+        var durationType = $('#durationType').val();
+        var specificDuration = $('#specificDuration').val();
+        var nextOfKin = $('#nextOfKin').val();
+        var nextOfKinPhone = $('#nextOfKinPhone').val();
+
+        // Calculate total amount to be paid back (principal + interest)
+        var interest = principal * fixedInterestRate * duration;
+        var totalAmount = parseFloat(principal) + parseFloat(interest);
+
+        // Send data to the server for database insertion
+        sendToDatabase(principal, fixedInterestRate, duration, durationType, specificDuration, nextOfKin, nextOfKinPhone, interest, totalAmount);
+
+        // Close the preview modal
+        $('#previewModal').modal('hide');
+
+        // Clear form fields
+        clearForm();
+    }
+
+    // ... (rest of the JavaScript code) ...
+</script>
+
+</body>
+
+</html>
