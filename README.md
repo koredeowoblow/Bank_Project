@@ -1,7 +1,3 @@
-Apologies for the earlier oversights. Upon a comprehensive review of your repository's `bank/` directory, including the `back/` and `front/` subdirectories, I've gathered detailed information to create an accurate `README.md` file.
-
----
-
 # Bank Project
 
 A simple banking system developed using core PHP with a functional programming approach. The project is organized into distinct frontend and backend components to facilitate separation of concerns.
