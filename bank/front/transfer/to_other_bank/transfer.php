@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $uniqueReference = generateUniqueReference();
 
 
-    $secretKey = 'sk_test_c8f05824e8480423710a00338bc1d6f603cc4bde';
+    $secretKey = '';
     $pin = md5($_POST['pin']);
     $amount = $_POST['amount'];
     $id = $_SESSION['User_id'];
