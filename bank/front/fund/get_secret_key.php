@@ -7,7 +7,7 @@ $output = array();
 
 if ($amount) {
     // Set this environment variable in your server configuration
-    $publicKey = 'pk_test_a93c53624574f373fb59dae807b22871e19eba9a';
+    $publicKey = '';
 
     // Process further or add values to the output array
     $output['result'] = 'success';
