@@ -9,7 +9,7 @@ if ($bankCode === "" || $acct_number === "") {
     exit();
 } else {
     $curl = curl_init();
-    $secretKey = 'sk_test_c8f05824e8480423710a00338bc1d6f603cc4bde';
+    $secretKey = '';
 
     curl_setopt_array($curl, array(
         CURLOPT_URL => "https://api.paystack.co/bank/resolve?account_number=" . rawurlencode($acct_number) . "&bank_code=" . rawurlencode($bankCode) . "",
