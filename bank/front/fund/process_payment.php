@@ -7,7 +7,7 @@ if ($ref == "") {
 } else {
     session_start();
     include("../funtion/conn.php");
-    $secretKey = 'sk_test_c8f05824e8480423710a00338bc1d6f603cc4bde';
+    $secretKey = '';
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
